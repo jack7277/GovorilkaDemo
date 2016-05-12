@@ -484,8 +484,10 @@ public class GovorilkaActivity extends Activity implements RecognitionListener{/
             final EditText editText = (EditText) findViewById(R.id.passwordText1);
             String s1 = editText.getText().toString();
 
+            String myPasswordAsText = "";
+
             // 173 = один семь три
-            String myPasswordAsText = digitToString(s1.charAt(0)) + " " +
+            myPasswordAsText = digitToString(s1.charAt(0)) + " " +
                     digitToString(s1.charAt(1)) + " " +
                     digitToString(s1.charAt(2));
 
@@ -682,7 +684,7 @@ public class GovorilkaActivity extends Activity implements RecognitionListener{/
     }
 
     public void lock1ButtonClick(View view) {
-        if (lock1Button) {
+        if (lock1Button == true) {
             ((ImageView) findViewById(R.id.lock1Button)).setImageResource(R.drawable.unlocked);
             lock1Button = false;
         } else {
