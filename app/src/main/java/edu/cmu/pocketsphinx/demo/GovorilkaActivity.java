@@ -484,10 +484,8 @@ public class GovorilkaActivity extends Activity implements RecognitionListener{/
             final EditText editText = (EditText) findViewById(R.id.passwordText1);
             String s1 = editText.getText().toString();
 
-            String myPasswordAsText = "";
-
             // 173 = один семь три
-            myPasswordAsText = digitToString(s1.charAt(0)) + " " +
+            String myPasswordAsText = digitToString(s1.charAt(0)) + " " +
                     digitToString(s1.charAt(1)) + " " +
                     digitToString(s1.charAt(2));
 
