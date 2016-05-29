@@ -10,7 +10,6 @@ public class lockScreenReceiver extends BroadcastReceiver {
 
     @Override
     public void onReceive(Context context, Intent intent) {
-
         // если экран выключен то запускаем наш лок скрин
         if (intent.getAction().equals(Intent.ACTION_SCREEN_OFF)) {
             wasScreenOn = false;

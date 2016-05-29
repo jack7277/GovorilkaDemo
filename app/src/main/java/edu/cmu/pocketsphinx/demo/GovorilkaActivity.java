@@ -32,15 +32,27 @@ package edu.cmu.pocketsphinx.demo;
 
 //import static android.widget.Toast.makeText;
 
+import android.Manifest;
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.content.res.AssetFileDescriptor;
+import android.graphics.Bitmap;
+import android.graphics.Matrix;
+import android.media.MediaPlayer;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.provider.MediaStore;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.telephony.PhoneStateListener;
 import android.telephony.TelephonyManager;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.View;
 import android.view.WindowManager;
-import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.RelativeLayout.LayoutParams;
@@ -49,28 +61,31 @@ import android.widget.TextView;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.rollbar.android.Rollbar;
 
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
+import java.io.OutputStreamWriter;
 import java.util.HashMap;
 import java.util.Scanner;
+import java.util.concurrent.TimeUnit;
 
 import edu.cmu.pocketsphinx.Assets;
 import edu.cmu.pocketsphinx.Hypothesis;
 import edu.cmu.pocketsphinx.RecognitionListener;
 import edu.cmu.pocketsphinx.SpeechRecognizer;
+import ru.yandex.speechkit.Recognition;
 import ru.yandex.speechkit.Recognizer;
+import ru.yandex.speechkit.RecognizerListener;
+import ru.yandex.speechkit.SpeechKit;
 
 import static edu.cmu.pocketsphinx.SpeechRecognizerSetup.defaultSetup;
 
-//import android.content.Intent;
-//import android.content.pm.ActivityInfo;
-//import android.content.pm.PackageInfo;
-//import android.content.pm.PackageManager;
-//import android.widget.Button;
-//import android.widget.ListView;import ru.yandex.speechkit.SpeechKit;
 
-
-public class GovorilkaActivity extends Activity implements RecognitionListener{//, RecognizerListener {
+public class GovorilkaActivity extends Activity implements RecognitionListener, RecognizerListener {
     //, TextToSpeech.OnInitListener {
 // наши часы
     private TextView clock;
@@ -102,6 +117,10 @@ public class GovorilkaActivity extends Activity implements RecognitionListener{/
 
     private int timeToListen = 3000;
 
+    boolean btn1Clicked = false;
+    boolean btn2Clicked = false;
+    boolean btn3Clicked = false;
+
     /* Keyword we are looking for to activate */
 //    private static final String KEYPHRASE = "няня";
 
@@ -113,12 +132,21 @@ public class GovorilkaActivity extends Activity implements RecognitionListener{/
 //    private TextToSpeech mTTS;
 
     private float senseValue = 1e-7f;
-    private boolean lock1Button = true;
+    private boolean lock1Button = false;
+    private boolean lock2Button = false;
+    private boolean lock3Button = false;
+    static final int GALLERY_REQUEST = 1;
+
+    boolean yandexIsOn = false;
+
+    File assetDir;
+
     /**
      * ATTENTION: This was auto-generated to implement the App Indexing API.
      * See https://g.co/AppIndexing/AndroidStudio for more information.
      */
     private GoogleApiClient client;
+    ImageView imageView;
 
     public float getSenseValue() {
         return senseValue;
@@ -128,130 +156,195 @@ public class GovorilkaActivity extends Activity implements RecognitionListener{/
         this.senseValue = senseValue;
     }
 
-//    private void createAndStartRecognizer() {
-//        final Context context = getApplicationContext();
-//        if (context == null) {
-//            return;
-//        }
-//
-//        if (ContextCompat.checkSelfPermission(context, RECORD_AUDIO) != PERMISSION_GRANTED) {
-//            requestPermissions(this, new String[]{RECORD_AUDIO}, REQUEST_PERMISSION_CODE);
-//        } else {
-//            // Reset the current recognizer.
-//            resetRecognizer();
-//            // To create a new recognizer, specify the language, the model - a scope of recognition to get the most appropriate results,
-//            // set the listener to handle the recognition events.
-//            recognizer2 = Recognizer.create(Recognizer.Language.RUSSIAN, Recognizer.Model.NOTES, this);
-//            // Don't forget to call start on the created object.
-//            recognizer2.start();
-//        }
-//    }
-//
-//    @Override
-//    public void onPowerUpdated(Recognizer recognizer2, float power) {
-////        updateProgress((int) (power * progressBar.getMax()));
-//    }
-//
-//    private void updateResult(String text) {
-//        ((TextView) findViewById(R.id.recognitionResult)).setText(text);
-//    }
-//
-//    private void updateStatus(final String text) {
-//        ((TextView) findViewById(R.id.recognitionResult)).setText(text);
-//    }
-//
-//    @Override
-//    public void onPause() {
-//        super.onPause();
-//        resetRecognizer();
-//    }
-//
-//
-//    private void resetRecognizer() {
-//        if (recognizer2 != null) {
-//            recognizer2.cancel();
-//            recognizer2 = null;
-//        }
-//    }
+    private void createAndStartRecognizer() {
+        final Context context = getApplicationContext();
+        if (context == null) {
+            return;
+        }
 
-//    @Override
-//    public void onRecordingBegin(Recognizer recognizer2) {
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.RECORD_AUDIO) != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.RECORD_AUDIO}, REQUEST_PERMISSION_CODE);
+        } else {
+            // Reset the current recognizer.
+            resetRecognizer();
+            // To create a new recognizer, specify the language, the model - a scope of recognition to get the most appropriate results,
+            // set the listener to handle the recognition events.
+            recognizer2 = Recognizer.create(Recognizer.Language.RUSSIAN, Recognizer.Model.NOTES, this);
+            // Don't forget to call start on the created object.
+            recognizer2.start();
+        }
+    }
+
+    @Override
+    public void onPowerUpdated(Recognizer recognizer2, float power) {
+//        updateProgress((int) (power * progressBar.getMax()));
+    }
+
+    private void updateResult(String text) {
+        ((TextView) findViewById(R.id.recognitionResult)).setText(text);
+    }
+
+    private void updateStatus(final String text) {
+        ((TextView) findViewById(R.id.recognitionResult)).setText(text);
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        resetRecognizer();
+    }
+
+
+    private void resetRecognizer() {
+        if (recognizer2 != null) {
+            recognizer2.cancel();
+            recognizer2 = null;
+        }
+    }
+
+    @Override
+    public void onRecordingBegin(Recognizer recognizer2) {
 //        updateStatus("Recording begin");
-//    }
-//
-//    @Override
-//    public void onSpeechDetected(Recognizer recognizer2) {
-//        updateStatus("Speech detected");
-//    }
-//
-//    @Override
-//    public void onSpeechEnds(Recognizer recognizer2) {
+    }
+
+    @Override
+    public void onSpeechDetected(Recognizer recognizer2) {
+        updateStatus("Speech detected");
+        findViewById(R.id.talkButton).setEnabled(false);
+        ((TextView) findViewById(R.id.caption_text)).setText("Яндекс слушает...");
+//        createAndStartRecognizer();
+    }
+
+    @Override
+    public void onSpeechEnds(Recognizer recognizer2) {
 //        updateStatus("Speech ends");
-//    }
-//
-//    @Override
-//    public void onRecordingDone(Recognizer recognizer2) {
+        findViewById(R.id.talkButton).setEnabled(true);
+        ((TextView) findViewById(R.id.caption_text)).setText("Яндекс услышал.");
+    }
+
+    @Override
+    public void onRecordingDone(Recognizer recognizer2) {
 //        updateStatus("Recording done");
-//    }
-//
-//    @Override
-//    public void onSoundDataRecorded(Recognizer recognizer2, byte[] bytes) {
-//    }
-//
-//
-//    @Override
-//    public void onPartialResults(Recognizer recognizer2, Recognition recognition, boolean b) {
-//        updateStatus("Partial results " + recognition.getBestResultText());
-//    }
-//
-//    @Override
-//    public void onRecognitionDone(Recognizer recognizer2, Recognition recognition) {
-//        updateResult(recognition.getBestResultText());
+    }
+
+    @Override
+    public void onSoundDataRecorded(Recognizer recognizer2, byte[] bytes) {
+    }
 
 
-//        final EditText editText = (EditText) findViewById(R.id.passwordText1);
-//        String s1 = editText.getText().toString();
-//
-//        String myPasswordAsText = "";
-//
-//        // 173 = один семь три
-//        myPasswordAsText = digitToString(s1.charAt(0)) + " " +
-//                digitToString(s1.charAt(1)) + " " +
-//                digitToString(s1.charAt(2));
-//
-//        String recognitionString = recognition.getBestResultText();
-//
-//        // пароь совпал
-//        if (recognitionString.contains(myPasswordAsText) || recognitionString.contains(s1)) {
-//            ((ImageView) findViewById(R.id.lock1Button)).setImageResource(R.drawable.ts);
-//            ((ImageView) findViewById(R.id.lock2Button)).setImageResource(R.drawable.bio);
-//            ((ImageView) findViewById(R.id.lock3Button)).setImageResource(R.drawable.bya);
-//        }
-//        findViewById(R.id.talkButton).setEnabled(true);
-//    }
-//
-//    @Override
-//    public void onError(Recognizer recognizer2, ru.yandex.speechkit.Error error) {
-//        if (error.getCode() == Error.ERROR_CANCELED) {
-//            updateStatus("Cancelled");
-//
-//        } else {
-//            updateStatus("Error occurred " + error.getString());
-//            resetRecognizer();
-//        }
-//    }
+    void checkCode(String bestPartialResults, int partialOrFinal) {
+        String[] separated = bestPartialResults.split(" ");
 
-//    private void saveFile(File f, String content) throws IOException {
-//        File dir = f.getParentFile();
-//        if (!dir.exists() && !dir.mkdirs()) {
-//            throw new IOException("Cannot create directory: " + dir);
-//        }
-//        FileUtils.writeStringToFile(f, content, "UTF8");
-//    }
+        String finalText = "";
+        for (int i = 0; i < (separated.length - 1); i++) {
+            finalText += separated[i] + ", ";
+        }
 
-    public static void hideSoftKeyboard(Activity activity) {
-        InputMethodManager inputMethodManager = (InputMethodManager)  activity.getSystemService(Activity.INPUT_METHOD_SERVICE);
-        inputMethodManager.hideSoftInputFromWindow(activity.getCurrentFocus().getWindowToken(), 0);
+        String recognitionString = bestPartialResults;
+        final EditText editText = (EditText) findViewById(R.id.passwordText1);
+        String s1 = editText.getText().toString();
+
+        String myPasswordAsText1 = s1.charAt(0) + "";
+        String myPasswordAsText2 = s1.charAt(1) + "";
+        String myPasswordAsText3 = s1.charAt(2) + "";
+
+        int pos1 = recognitionString.indexOf(myPasswordAsText1);
+        int pos2 = recognitionString.indexOf(myPasswordAsText2);
+        int pos3 = recognitionString.indexOf(myPasswordAsText3);
+
+        ((TextView) findViewById(R.id.recognitionResult)).setText(recognitionString + ", " + pos1 + " " + pos2 + " " + pos3);
+
+        if (pos1 >= 0 && pos1 < pos2) {
+            // 1 картинка
+            showPic("pic1.txt", "lock1Button");
+
+            if (pos2 > 0 && pos2 > pos1) {
+                // 2 картинка
+                showPic("pic2.txt", "lock2Button");
+
+                if (pos3 > 0 && pos3 > pos2 && pos3 > pos1) {
+                    // 3 картинка
+                    showPic("pic3.txt", "lock3Button");
+
+                    if (partialOrFinal == 1) {
+                        try {
+                            TimeUnit.MILLISECONDS.sleep(500);
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
+                        }
+
+                        // звук
+                        playTadaWin31Sound();
+
+                        ((ImageView) findViewById(R.id.lock1Button)).setImageResource(R.drawable.ts);
+                        ((ImageView) findViewById(R.id.lock2Button)).setImageResource(R.drawable.bio);
+                        ((ImageView) findViewById(R.id.lock3Button)).setImageResource(R.drawable.bya);
+                    }
+                }
+            }
+        }
+    }
+
+    @Override
+    public void onPartialResults(Recognizer recognizer2, Recognition recognition, boolean b) {
+//      updateStatus("Неточный результат: " + recognition.getBestResultText());
+        String bestPartialResults = recognition.getBestResultText();
+        checkCode(bestPartialResults, 0);
+    }
+
+    @Override
+    public void onRecognitionDone(Recognizer recognizer2, Recognition recognition) {
+        String recognitionString = recognition.getBestResultText();
+//        updateResult(recognitionString + " final");
+
+        checkCode(recognitionString, 1);
+
+        findViewById(R.id.talkButton).setEnabled(true);
+        ((TextView) findViewById(R.id.caption_text)).setText("Готов.");
+    }
+
+    @Override
+    public void onError(Recognizer recognizer2, ru.yandex.speechkit.Error error) {
+        if (error.getCode() == error.ERROR_CANCELED) {
+            updateStatus("Cancelled");
+
+        } else {
+            updateStatus("Error occurred " + error.getString());
+            resetRecognizer();
+        }
+    }
+
+    public void SphinxInit() {
+        new AsyncTask<Void, Void, Exception>() {
+            @Override
+            protected Exception doInBackground(Void... params) {
+                try {
+                    Assets assets = new Assets(GovorilkaActivity.this);
+//                    File assetDir = assets.syncAssets();
+                    assetDir = assets.syncAssets();
+                    setupRecognizer(assetDir);
+                } catch (IOException e) {
+                    Rollbar.reportException(e, "critical", "Crash at doInBackground");
+                    return e;
+                }
+                return null;
+            }
+
+            @Override
+            protected void onPostExecute(Exception result) {
+                if (result != null) {
+//                    ((TextView) findViewById(R.id.caption_text)).setText("Ошибка инициализации... " + result);
+                    Rollbar.reportException(result, "critical", "init error");
+                } else {
+                    // включаем кнопку говорить после инициализации
+                    findViewById(R.id.talkButton).setEnabled(true);
+                    findViewById(R.id.exitButton).setEnabled(true);
+                    ((TextView) findViewById(R.id.caption_text)).setText("Готов.");
+                    ((TextView) findViewById(R.id.log_text)).setText(""); // чистим если показали ошибку чтения sense.value из файла
+//                    switchSearch(KWS_SEARCH);
+                }
+            }
+        }.execute();
     }
 
     @Override
@@ -285,71 +378,42 @@ public class GovorilkaActivity extends Activity implements RecognitionListener{/
 
         setContentView(R.layout.main);
 
-
-
-//        if ((getIntent() != null) && getIntent().hasExtra("kill")
-//                && (getIntent().getExtras().getInt("kill") == 1)) {
-//            finish();
-//        }
-
-            try {
-                // инициализация рисивера
-                startService(new Intent(this, GovorilkaService.class));
-                // стартуем отслеживание состояния телефона
-                PhoneStateListener phoneStateListener = new PhoneStateListener();
-                // узнаем все сервисы которые есть
-                TelephonyManager telephonyManager = (TelephonyManager) getSystemService(TELEPHONY_SERVICE);
-                // слушаем когда телефон уходит в сон и включаем нашего блокировщика
-                telephonyManager.listen(phoneStateListener, PhoneStateListener.LISTEN_CALL_STATE);
-                // хватаем размеры экрана и растягиваем под него локскрин
+        try {
+            // инициализация рисивера
+            startService(new Intent(this, GovorilkaService.class));
+            // стартуем отслеживание состояния телефона
+            PhoneStateListener phoneStateListener = new PhoneStateListener();
+            // узнаем все сервисы которые есть
+            TelephonyManager telephonyManager = (TelephonyManager) getSystemService(TELEPHONY_SERVICE);
+            // слушаем когда телефон уходит в сон и включаем нашего блокировщика
+            telephonyManager.listen(phoneStateListener, PhoneStateListener.LISTEN_CALL_STATE);
+            // хватаем размеры экрана и растягиваем под него локскрин
 //                windowwidth = getWindowManager().getDefaultDisplay().getWidth();
 //                windowheight = getWindowManager().getDefaultDisplay().getHeight();
 
-            } catch (Exception e) {
-                Rollbar.reportException(e, "critical", "Crash at start GovorilkaSerice");
-            }
-
-            // Отключаем кнопку говорить, пока не инициализируется движок
-            findViewById(R.id.talkButton).setEnabled(false);
-            findViewById(R.id.exitButton).setEnabled(false);
-            ((TextView) findViewById(R.id.caption_text)).setText("Подготовка..."); // Preparing the recognizer
-
-            // Recognizer initialization is a time-consuming and it involves IO,
-            // so we execute it in async task
-
-
-            new AsyncTask<Void, Void, Exception>() {
-                @Override
-                protected Exception doInBackground(Void... params) {
-                    try {
-                        Assets assets = new Assets(GovorilkaActivity.this);
-                        File assetDir = assets.syncAssets();
-                        setupRecognizer(assetDir);
-                    } catch (IOException e) {
-                        Rollbar.reportException(e, "critical", "Crash at doInBackground");
-                        return e;
-                    }
-                    return null;
-                }
-
-                @Override
-                protected void onPostExecute(Exception result) {
-                    if (result != null) {
-//                    ((TextView) findViewById(R.id.caption_text)).setText("Ошибка инициализации... " + result);
-                        Rollbar.reportException(result, "critical", "init error");
-                    } else {
-                        // включаем кнопку говорить после инициализации
-                        findViewById(R.id.talkButton).setEnabled(true);
-                        findViewById(R.id.exitButton).setEnabled(true);
-                        ((TextView) findViewById(R.id.caption_text)).setText("Готов.");
-                        ((TextView) findViewById(R.id.log_text)).setText(""); // чистим если показали ошибку чтения sense.value из файла
-
-
-//                    switchSearch(KWS_SEARCH);
-                    }
-                }
-            }.execute();
+        } catch (Exception e) {
+            Rollbar.reportException(e, "critical", "Crash at start GovorilkaSerice");
         }
+
+        // Отключаем кнопку говорить, пока не инициализируется движок
+        findViewById(R.id.talkButton).setEnabled(false);
+        findViewById(R.id.exitButton).setEnabled(false);
+        ((TextView) findViewById(R.id.caption_text)).setText("Подготовка..."); // Preparing the recognizer
+
+        // Recognizer initialization is a time-consuming and it involves IO,
+        // so we execute it in async task
+
+        SphinxInit();
+
+        openPasswordFile("code.txt");
+
+        EditText et = (EditText) findViewById(R.id.passwordText1);
+        passwordText1Watcher inputTextWatcher = new passwordText1Watcher(et);
+        et.addTextChangedListener(inputTextWatcher);
+
+//        turnYandexOn();
+
+    }
 
 
     // класс слушатель тач евентов
@@ -360,7 +424,6 @@ public class GovorilkaActivity extends Activity implements RecognitionListener{/
 
             super.onCallStateChanged(state, incomingNumber);
             switch (state) {
-                // если яблоко коснулось дроида то выключаем лок скрин
                 case TelephonyManager.CALL_STATE_OFFHOOK: {
                     finish();
                 }
@@ -368,7 +431,7 @@ public class GovorilkaActivity extends Activity implements RecognitionListener{/
             }
         }
     }
-        //    @Override
+    //    @Override
 //    public void onInit(int status) {
 //        if (status == TextToSpeech.SUCCESS) {
 //
@@ -389,41 +452,140 @@ public class GovorilkaActivity extends Activity implements RecognitionListener{/
 //        }
 //
 //    }
-        // При закрытии программы всё останавливаем
-        @Override
-        public void onDestroy () {
+    // При закрытии программы всё останавливаем
+
+    public void destroyApp(View view) {
+
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
 //        if (mTTS != null) {
 //            mTTS.stop();
 //            mTTS.shutdown();
 //        }
-            super.onDestroy();
+        try {
+            recognizer.cancel();
+            recognizer.shutdown();
+        } catch (NullPointerException e) {
+            Rollbar.reportException(e, "critical", "crashed at OnDestroy");
+        } finally {
+            finish();
+        }
+    }
+
+    public static Bitmap getResizedBitmap(Bitmap image, int newHeight, int newWidth) {
+        int width = image.getWidth();
+        int height = image.getHeight();
+        float scaleWidth = ((float) newWidth) / width;
+        float scaleHeight = ((float) newHeight) / height;
+        // create a matrix for the manipulation
+        Matrix matrix = new Matrix();
+        // resize the bit map
+        matrix.postScale(scaleWidth, scaleHeight);
+        // recreate the new Bitmap
+        Bitmap resizedBitmap = Bitmap.createBitmap(image, 0, 0, width, height,
+                matrix, false);
+        return resizedBitmap;
+    }
+
+    void showPic(String filename, String buttonName) {
+        Bitmap bitmap = null;
+        Bitmap scaledBitmap = null;
+
+        String imagePath = openPicInfo(filename);
+
+        if (imagePath != null && imagePath != "") {
+            Uri selectedImage = Uri.parse(imagePath);
             try {
-                recognizer.cancel();
-                recognizer.shutdown();
-            } catch (NullPointerException e) {
-                Rollbar.reportException(e, "critical", "crashed at OnDestroy");
-            } finally {
-                finish();
+                bitmap = MediaStore.Images.Media.getBitmap(getContentResolver(), selectedImage);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+            int imageH = bitmap.getHeight();
+            int imageW = bitmap.getWidth();
+            float koef = imageW / imageH;
+
+            if (buttonName == "lock1Button") {
+                imageView = (ImageView) findViewById(R.id.lock1Button);
+                int lock1ButtonH = findViewById(R.id.lock1Button).getHeight();
+                int lock1ButtonW = findViewById(R.id.lock1Button).getWidth();
+                int tmpH = 1;
+                if (lock1ButtonH <= lock1ButtonW) {
+                    tmpH = (int) (lock1ButtonW * koef);
+                } else {
+                    tmpH = (int) (lock1ButtonH * koef);
+                }
+                scaledBitmap = getResizedBitmap(bitmap, tmpH, lock1ButtonW);
+                bitmap.recycle();
+            }
+            if (buttonName == "lock2Button") {
+                imageView = (ImageView) findViewById(R.id.lock2Button);
+                int lock2ButtonH = findViewById(R.id.lock2Button).getHeight();
+                int lock2ButtonW = findViewById(R.id.lock2Button).getWidth();
+                int tmpH = (int) (lock2ButtonW * koef);
+                scaledBitmap = getResizedBitmap(bitmap, tmpH, lock2ButtonW);
+                bitmap.recycle();
+            }
+            if (buttonName == "lock3Button") {
+                imageView = (ImageView) findViewById(R.id.lock3Button);
+                int lock3ButtonH = findViewById(R.id.lock3Button).getHeight();
+                int lock3ButtonW = findViewById(R.id.lock3Button).getWidth();
+                int tmpH = (int) (lock3ButtonW * koef);
+                scaledBitmap = getResizedBitmap(bitmap, tmpH, lock3ButtonW);
+                bitmap.recycle();
+            }
+
+            imageView.setImageBitmap(scaledBitmap);
+        }
+    }
+
+    /**
+     * In partial result we get quick updates about current hypothesis. In
+     * keyword spotting mode we can react here, in other modes we need to wait
+     * for final result in onResult.
+     */
+    @Override
+    public void onPartialResult(Hypothesis hypothesis) {
+        if (hypothesis == null) return;
+
+        String recognitionString = hypothesis.getHypstr();
+        int bestScore = hypothesis.getBestScore();
+
+        final EditText editText = (EditText) findViewById(R.id.passwordText1);
+        String s1 = editText.getText().toString();
+
+        String myPasswordAsText1 = digitToString(s1.charAt(0));
+        String myPasswordAsText2 = digitToString(s1.charAt(1));
+        String myPasswordAsText3 = digitToString(s1.charAt(2));
+
+        int pos1 = recognitionString.indexOf(myPasswordAsText1);
+        int pos2 = recognitionString.indexOf(myPasswordAsText2);
+        int pos3 = recognitionString.indexOf(myPasswordAsText3);
+
+        ((TextView) findViewById(R.id.recognitionResult)).setText(recognitionString + ", " + bestScore + " " + pos1 + " " + pos2 + " " + pos3);
+
+        if (pos1 == 0) {
+            // 1 картинка
+            showPic("pic1.txt", "lock1Button");
+
+            if (pos2 - myPasswordAsText1.length() - 1 == 0) {
+                // 2 картинка
+                showPic("pic2.txt", "lock2Button");
+
+                if ((pos3 - myPasswordAsText1.length() - 1 - myPasswordAsText2.length() - 1) == 0) {
+                    // 3 картинка
+                    showPic("pic3.txt", "lock3Button");
+                }
             }
         }
 
-        /**
-         * In partial result we get quick updates about current hypothesis. In
-         * keyword spotting mode we can react here, in other modes we need to wait
-         * for final result in onResult.
-         */
-        @Override
-        public void onPartialResult (Hypothesis hypothesis){
-            if (hypothesis == null) return;
-
-            String text = hypothesis.getHypstr();
-            int bestScore = hypothesis.getBestScore();
-
-//        ((TextView) findViewById(R.id.log_text)).setText(text + ", " + bestScore);
 //        if (text.equals(KEYPHRASE)) {
 //            switchSearch(CODE_PHRASE_SEARCH);
 //        }
-        }
+    }
 
     protected String digitToString(char digit) {
         String digitToStringText = "";
@@ -470,6 +632,22 @@ public class GovorilkaActivity extends Activity implements RecognitionListener{/
      * This callback is called when we stop the recognizer.
      */
 
+    void playTadaWin31Sound() {
+        try {
+            MediaPlayer m = new MediaPlayer();
+
+            AssetFileDescriptor descriptor = getAssets().openFd("sync/Sounds/win31.mp3");
+            m.setDataSource(descriptor.getFileDescriptor(), descriptor.getStartOffset(), descriptor.getLength());
+            descriptor.close();
+
+            m.prepare();
+            m.setVolume(1f, 1f);
+            m.setLooping(false);
+            m.start();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
 
     @Override
     public void onResult(Hypothesis hypothesis) {
@@ -481,7 +659,7 @@ public class GovorilkaActivity extends Activity implements RecognitionListener{/
 //            float confidence = ((float) bestScore) / (float) nmsec;
 
             // берем число из поля ввода и создаем строку для сравнения
-            final EditText editText = (EditText) findViewById(R.id.passwordText1);
+            EditText editText = (EditText) findViewById(R.id.passwordText1);
             String s1 = editText.getText().toString();
 
             // 173 = один семь три
@@ -495,15 +673,27 @@ public class GovorilkaActivity extends Activity implements RecognitionListener{/
             ((TextView) findViewById(R.id.log_text)).setText(text);
 
             // пароь совпал
-            if (recognitionString.contains(myPasswordAsText) || recognitionString.contains(s1)) {
+            MediaPlayer mp = null;
+            if (recognitionString.contains(myPasswordAsText)) {
+                // задержка
+                try {
+                    TimeUnit.MILLISECONDS.sleep(500);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+
+                playTadaWin31Sound();
+
                 ((ImageView) findViewById(R.id.lock1Button)).setImageResource(R.drawable.ts);
                 ((ImageView) findViewById(R.id.lock2Button)).setImageResource(R.drawable.bio);
                 ((ImageView) findViewById(R.id.lock3Button)).setImageResource(R.drawable.bya);
-
-//                finish();
             }
+//                finish();
         }
+
+        findViewById(R.id.talkButton).setEnabled(true);
     }
+
 
     @Override
     public void onBeginningOfSpeech() {
@@ -554,8 +744,6 @@ public class GovorilkaActivity extends Activity implements RecognitionListener{/
             Rollbar.reportException(e, "critical", "error reading/parse sense.value");
 //            ((TextView) findViewById(R.id.log_text)).setText("Ошибка чтения/формата sense.value");
         }
-
-
     }
 
     private void setupRecognizer(File assetsDir) throws IOException, NumberFormatException {
@@ -646,7 +834,6 @@ public class GovorilkaActivity extends Activity implements RecognitionListener{/
 //        recognizer.addGrammarSearch(CODE_PHRASE_SEARCH, jsgf);
     }
 
-
     @Override
     public void onError(Exception error) {
         Rollbar.reportException(error, "critical", "error in onError method");
@@ -666,14 +853,18 @@ public class GovorilkaActivity extends Activity implements RecognitionListener{/
     }
 
     public void onTalkButtonClick(View view) {
-        //switchSearch(CODE_PHRASE_SEARCH);
-        resetButtonClick(view);
-
-        findViewById(R.id.talkButton).setEnabled(false);
+        if (yandexIsOn) {
+            resetButtonClick(view);
+            findViewById(R.id.talkButton).setEnabled(false);
+            ((TextView) findViewById(R.id.caption_text)).setText("Яндекс слушает...");
+            createAndStartRecognizer();
+        } else {
+            //switchSearch(CODE_PHRASE_SEARCH);
+            resetButtonClick(view);
+            findViewById(R.id.talkButton).setEnabled(false);
 //        startTimestamp = System.currentTimeMillis();
-        recognizer.startListening(CODE_PHRASE_SEARCH, timeToListen);
-
-//        createAndStartRecognizer();
+            recognizer.startListening(CODE_PHRASE_SEARCH, timeToListen);
+        }
     }
 
     public void ackBtnClick(View view) {
@@ -681,16 +872,6 @@ public class GovorilkaActivity extends Activity implements RecognitionListener{/
 //        mTTS.speak(text, TextToSpeech.QUEUE_FLUSH, null);
     }
 
-    public void lock1ButtonClick(View view) {
-        if (lock1Button == true) {
-            ((ImageView) findViewById(R.id.lock1Button)).setImageResource(R.drawable.unlocked);
-            lock1Button = false;
-        } else {
-            ((ImageView) findViewById(R.id.lock1Button)).setImageResource(R.drawable.locked);
-            lock1Button = true;
-        }
-    }
-//
 //    public void sensePlusButtonClick(View view) {
 //        senseValue *= 10;
 ////        senseValue = Math.round((senseValue * 100d) / 100d);
@@ -710,4 +891,225 @@ public class GovorilkaActivity extends Activity implements RecognitionListener{/
 
         findViewById(R.id.talkButton).setEnabled(true);
     }
+
+    public void turnYandexOn(View view) {
+        if (yandexIsOn == false) {
+//        if (mTTS != null) {
+//            mTTS.stop();
+//            mTTS.shutdown();
+//        }
+            try {
+                recognizer.cancel();
+                recognizer.shutdown();
+            } catch (NullPointerException e) {
+                Rollbar.reportException(e, "critical", "crashed at OnDestroy");
+            } finally {
+
+            }
+
+            SpeechKit.getInstance().configure(getApplicationContext(), YANDEX_API_KEY);
+            yandexIsOn = true;
+            return;
+        }
+
+        if (yandexIsOn = true) {
+            yandexIsOn = false;
+            try {
+                recognizer2.cancel();
+            } catch (Exception e) {
+
+            }
+            try {
+                SphinxInit();
+            } catch (Exception e) {
+
+            }
+            return;
+        }
+
+    }
+
+    void callGallery() {
+        Intent photoPickerIntent = new Intent(Intent.ACTION_PICK);
+        photoPickerIntent.setType("image/*");
+        startActivityForResult(photoPickerIntent, GALLERY_REQUEST);
+    }
+
+    public void btn1Click(View view) {
+        callGallery();
+        btn1Clicked = true;
+    }
+
+    public void btn2Click(View view) {
+        callGallery();
+        btn2Clicked = true;
+    }
+
+    public void btn3Click(View view) {
+        callGallery();
+        btn3Clicked = true;
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent imageReturnedIntent) {
+        super.onActivityResult(requestCode, resultCode, imageReturnedIntent);
+
+        Bitmap bitmap = null;
+        switch (requestCode) {
+            case GALLERY_REQUEST:
+                if (resultCode == RESULT_OK) {
+                    Uri selectedImage = imageReturnedIntent.getData();
+
+                    String imagePath = "content://media" + selectedImage.getPath(); //      /external/images/media/9012
+//                    selectedImage = Uri.parse(imagePath);
+
+                    if (btn1Clicked) {
+                        imageView = (ImageView) findViewById(R.id.lock1Button);
+                        savePicInfo("pic1.txt", imagePath);
+                        showPic("pic1.txt", "lock1Button");
+                    }
+                    if (btn2Clicked) {
+                        imageView = (ImageView) findViewById(R.id.lock2Button);
+                        savePicInfo("pic2.txt", imagePath);
+                        showPic("pic2.txt", "lock2Button");
+                    }
+                    if (btn3Clicked) {
+                        imageView = (ImageView) findViewById(R.id.lock3Button);
+                        savePicInfo("pic3.txt", imagePath);
+                        showPic("pic3.txt", "lock3Button");
+                    }
+//                    try {
+//                        bitmap = MediaStore.Images.Media.getBitmap(getContentResolver(), selectedImage);
+//                    } catch (IOException e) {
+//                        e.printStackTrace();
+//                    }
+//
+//                    imageView.setImageBitmap(bitmap);
+                }
+        }
+
+        btn1Clicked = false;
+        btn2Clicked = false;
+        btn3Clicked = false;
+    }
+
+    void savePicInfo(String filename, String imagePath) {
+        try {
+            OutputStream outputStream = openFileOutput(filename, 0);
+            OutputStreamWriter osw = new OutputStreamWriter(outputStream);
+            osw.write(imagePath);
+            osw.close();
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    String openPicInfo(String filename) {
+        String imagePath = "";
+        try {
+            InputStream inputStream = openFileInput(filename);
+
+            if (inputStream != null) {
+                InputStreamReader isr = new InputStreamReader(inputStream);
+                BufferedReader reader = new BufferedReader(isr);
+
+//                FileInputStream fIn = openFileInput(filename);
+//                InputStreamReader isr2 = new InputStreamReader(fIn);
+//                char[] inputBuffer= new char[1000];
+//                isr2.read(inputBuffer);
+//                imagePath = new String(inputBuffer);
+
+//                StringBuilder builder = new StringBuilder();
+//                while ((imagePath = reader.readLine()) != null) {
+                try {
+                    imagePath = reader.readLine();
+                } catch (Exception e) {
+
+                }
+
+//                    builder.append(imagePath);
+//                    imagePath = inputStream.
+//     imagePath = builder.toString();
+
+                inputStream.close();
+            }
+        } catch (Throwable t) {
+//            Toast.makeText(getApplicationContext(),
+//                    "Exception: " + t.toString(), Toast.LENGTH_LONG).show();
+        }
+
+        return imagePath;
+    }
+
+    public class passwordText1Watcher implements TextWatcher {
+        public EditText editText;
+
+        public passwordText1Watcher(EditText et) {
+            super();
+            editText = et;
+        }
+
+        public void afterTextChanged(Editable s) {
+//            ((TextView) findViewById(R.id.log_text)).setText("Текст изменен");
+            savePasswordFile("code.txt");
+        }
+
+        public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+            ((TextView) findViewById(R.id.log_text)).setText("");
+        }
+
+        public void onTextChanged(CharSequence s, int start, int before, int count) {
+        }
+    }
+
+    // Метод для сохранения файла с кодом
+    void savePasswordFile(String filename) {
+        if (filename == "code.txt") {
+            try {
+                OutputStream outputStream = openFileOutput(filename, 0);
+                OutputStreamWriter osw = new OutputStreamWriter(outputStream);
+
+                EditText editText = (EditText) findViewById(R.id.passwordText1);
+                String s1 = editText.getText().toString().trim();
+
+                osw.write(s1);
+                osw.close();
+            } catch (FileNotFoundException e) {
+                e.printStackTrace();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    // Метод для открытия файла с кодом
+    private void openPasswordFile(String filename) {
+        if (filename == "code.txt") {
+            try {
+                InputStream inputStream = openFileInput(filename);
+
+                if (inputStream != null) {
+                    InputStreamReader isr = new InputStreamReader(inputStream);
+                    BufferedReader reader = new BufferedReader(isr);
+                    String passwordEditText="";
+//                    StringBuilder builder = new StringBuilder();
+
+                    try {
+                        passwordEditText = reader.readLine();
+                    } catch (Exception e) {
+                    }
+
+                    inputStream.close();
+                    EditText editText = (EditText) findViewById(R.id.passwordText1);
+                    editText.setText(passwordEditText);
+                }
+            } catch (Throwable t) {
+//                Toast.makeText(getApplicationContext(),
+//                        "Exception: " + t.toString(), Toast.LENGTH_LONG).show();
+            }
+        }
+    }
+
 }
