@@ -506,39 +506,53 @@ public class GovorilkaActivity extends Activity implements RecognitionListener, 
 
             int imageH = bitmap.getHeight();
             int imageW = bitmap.getWidth();
-            float koef = imageW / imageH;
+            float koef = (float) imageW / imageH;
+            int tmpH = 1;
 
             if (buttonName == "lock1Button") {
                 imageView = (ImageView) findViewById(R.id.lock1Button);
                 int lock1ButtonH = findViewById(R.id.lock1Button).getHeight();
                 int lock1ButtonW = findViewById(R.id.lock1Button).getWidth();
-                int tmpH = 1;
-                if (lock1ButtonH <= lock1ButtonW) {
-                    tmpH = (int) (lock1ButtonW * koef);
+
+                if (lock1ButtonW <= lock1ButtonH) {
+                    tmpH = (int) (lock1ButtonW / koef);
                 } else {
-                    tmpH = (int) (lock1ButtonH * koef);
+                    tmpH = (int) (lock1ButtonH / koef);
                 }
+
                 scaledBitmap = getResizedBitmap(bitmap, tmpH, lock1ButtonW);
-                bitmap.recycle();
             }
             if (buttonName == "lock2Button") {
                 imageView = (ImageView) findViewById(R.id.lock2Button);
                 int lock2ButtonH = findViewById(R.id.lock2Button).getHeight();
                 int lock2ButtonW = findViewById(R.id.lock2Button).getWidth();
-                int tmpH = (int) (lock2ButtonW * koef);
+                if (lock2ButtonW <= lock2ButtonH) {
+                    tmpH = (int) (lock2ButtonW / koef);
+                } else {
+                    tmpH = (int) (lock2ButtonH / koef);
+                }
                 scaledBitmap = getResizedBitmap(bitmap, tmpH, lock2ButtonW);
-                bitmap.recycle();
             }
             if (buttonName == "lock3Button") {
                 imageView = (ImageView) findViewById(R.id.lock3Button);
                 int lock3ButtonH = findViewById(R.id.lock3Button).getHeight();
                 int lock3ButtonW = findViewById(R.id.lock3Button).getWidth();
-                int tmpH = (int) (lock3ButtonW * koef);
+                if (lock3ButtonW <= lock3ButtonH) {
+                    tmpH = (int) (lock3ButtonW / koef);
+                } else {
+                    tmpH = (int) (lock3ButtonH / koef);
+                }
                 scaledBitmap = getResizedBitmap(bitmap, tmpH, lock3ButtonW);
-                bitmap.recycle();
             }
 
             imageView.setImageBitmap(scaledBitmap);
+
+            if (bitmap != null) {
+                bitmap.recycle();
+                bitmap = null;
+                System.gc();
+            }
+            // System.gc();
         }
     }
 
@@ -929,24 +943,24 @@ public class GovorilkaActivity extends Activity implements RecognitionListener, 
 
     }
 
-    void callGallery() {
+    void callGalleryPickPhoto() {
         Intent photoPickerIntent = new Intent(Intent.ACTION_PICK);
         photoPickerIntent.setType("image/*");
         startActivityForResult(photoPickerIntent, GALLERY_REQUEST);
     }
 
     public void btn1Click(View view) {
-        callGallery();
+        callGalleryPickPhoto();
         btn1Clicked = true;
     }
 
     public void btn2Click(View view) {
-        callGallery();
+        callGalleryPickPhoto();
         btn2Clicked = true;
     }
 
     public void btn3Click(View view) {
-        callGallery();
+        callGalleryPickPhoto();
         btn3Clicked = true;
     }
 
@@ -1093,7 +1107,7 @@ public class GovorilkaActivity extends Activity implements RecognitionListener, 
                 if (inputStream != null) {
                     InputStreamReader isr = new InputStreamReader(inputStream);
                     BufferedReader reader = new BufferedReader(isr);
-                    String passwordEditText="";
+                    String passwordEditText = "";
 //                    StringBuilder builder = new StringBuilder();
 
                     try {
