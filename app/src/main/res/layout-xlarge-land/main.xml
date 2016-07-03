@@ -11,47 +11,6 @@
     <LinearLayout
         android:orientation="horizontal"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
-
-        <FrameLayout
-            android:layout_width="match_parent"
-            android:layout_height="match_parent">
-
-            <ToggleButton
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:id="@+id/toggleButton2"
-                android:layout_gravity="center"
-                android:onClick="turnYandexOn"
-                android:longClickable="false"
-                android:enabled="true"
-                android:checked="false" />
-
-            <EditText
-                android:layout_width="101dp"
-                android:layout_height="wrap_content"
-                android:id="@+id/passwordText1"
-                android:inputType="text"
-                android:text="257"
-                android:layout_weight="1"
-                android:singleLine="true"
-                android:layout_gravity="right|center_vertical" />
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="match_parent"
-                android:textAppearance="?android:attr/textAppearanceMedium"
-                android:text="Яндекс онлайн"
-                android:id="@+id/textView3"
-                android:layout_gravity="left|center_vertical" />
-
-        </FrameLayout>
-
-    </LinearLayout>
-
-    <LinearLayout
-        android:orientation="horizontal"
-        android:layout_width="match_parent"
         android:layout_height="55dp">
 
         <Button
@@ -84,45 +43,6 @@
     </LinearLayout>
 
 
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="98dp"
-        android:gravity="center"
-        android:weightSum="1"
-        android:orientation="horizontal"
-        android:layout_gravity="center">
-
-        <ImageButton
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:id="@+id/lock1Button"
-            android:clickable="true"
-            android:scaleType="fitCenter"
-            android:src="@drawable/locked"
-            android:layout_weight="0.33"
-            android:onClick="btn1Click" />
-
-        <ImageButton
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:id="@+id/lock2Button"
-            android:clickable="true"
-            android:scaleType="fitCenter"
-            android:src="@drawable/locked"
-            android:layout_weight="0.33"
-            android:onClick="btn2Click" />
-
-        <ImageButton
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:id="@+id/lock3Button"
-            android:clickable="true"
-            android:scaleType="fitCenter"
-            android:layout_weight="0.33"
-            android:src="@drawable/locked"
-            android:onClick="btn3Click" />
-    </LinearLayout>
-
     <ImageView
         android:layout_width="fill_parent"
         android:layout_height="270dp"
@@ -143,12 +63,5 @@
         android:layout_height="wrap_content"
         android:textAppearance="?android:attr/textAppearanceMedium"
         android:layout_width="match_parent" />
-
-    <TextView
-        android:id="@+id/recognitionResult"
-        android:layout_height="wrap_content"
-        android:textAppearance="?android:attr/textAppearanceMedium"
-        android:layout_width="match_parent"
-        android:singleLine="true" />
 
 </LinearLayout>
