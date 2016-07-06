@@ -8,60 +8,103 @@
     tools:context=".GovorilkaActivity"
     android:weightSum="1">
 
+
     <LinearLayout
         android:orientation="horizontal"
         android:layout_width="match_parent"
-        android:layout_height="55dp">
+        android:layout_height="wrap_content"
+        android:layout_weight="0.02" >
 
         <Button
             android:onClick="buttonExitClick"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
             android:text="@string/btnExit"
-            android:id="@+id/exitButton"
+            android:id="@+id/exitBtn"
             android:enabled="true"
             android:clickable="true"
-            android:layout_weight="0.5" />
+            android:layout_weight="1"
+            android:singleLine="true"
+            android:textSize="20sp" />
 
         <Button
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
-            android:text="@string/resetxLarge"
-            android:id="@+id/resetButton"
+            android:text="@string/settingsBtn"
+            android:id="@+id/settingsBtn"
+            android:layout_weight="1"
+            android:singleLine="true"
+            android:textSize="20sp"
+            android:clickable="true"
+            android:onClick="callSettingsScreen"
+            android:enabled="true" />
+
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:text="@string/reset"
+            android:id="@+id/resetBtn"
+            android:layout_weight="1"
             android:onClick="resetButtonClick"
-            android:layout_weight="0.5" />
+            android:singleLine="true"
+            android:textSize="20sp"
+            android:clickable="true"
+            android:enabled="true" />
 
         <Button
             android:onClick="onTalkButtonClick"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_height="match_parent"
             android:text="@string/talkButtonText"
-            android:id="@+id/talkButton"
-            android:singleLine="false"
-            android:layout_weight="0.5" />
-
+            android:id="@+id/talkBtn"
+            android:singleLine="true"
+            android:layout_weight="1"
+            android:textSize="20sp"
+            android:clickable="true"
+            android:enabled="true" />
     </LinearLayout>
-
 
     <ImageView
         android:layout_width="fill_parent"
-        android:layout_height="270dp"
+        android:layout_height="wrap_content"
         android:id="@+id/imageViewBig"
         android:layout_gravity="center_horizontal"
-        android:scaleType="fitCenter" />
+        android:scaleType="fitCenter"
+        android:layout_weight=".6" />
 
-    <TextView
-        android:id="@+id/caption_text"
+    <LinearLayout
+        android:orientation="horizontal"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:textAppearance="?android:attr/textAppearanceLarge"
-        android:typeface="sans" />
+        android:layout_weight="0.25" >
+
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:id="@+id/smallPic1"
+            android:layout_weight="1"
+            android:scaleType="fitCenter" />
+
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:id="@+id/smallPic2"
+            android:layout_weight="1"
+            android:scaleType="fitCenter" />
+
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:id="@+id/smallPic3"
+            android:layout_weight="1"
+            android:scaleType="fitCenter" />
+    </LinearLayout>
 
     <TextView
         android:id="@+id/log_text"
-
         android:layout_height="wrap_content"
         android:textAppearance="?android:attr/textAppearanceMedium"
-        android:layout_width="match_parent" />
+        android:layout_width="match_parent"
+        android:layout_weight=".05" />
 
 </LinearLayout>
