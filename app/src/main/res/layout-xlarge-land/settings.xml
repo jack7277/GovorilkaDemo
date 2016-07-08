@@ -14,28 +14,32 @@
     <LinearLayout
         android:orientation="horizontal"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:layout_weight="0.05">
 
         <Spinner
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="match_parent"
             android:id="@+id/codeSpinner1"
             android:layout_weight="1"
-            android:spinnerMode="dialog" />
+            android:spinnerMode="dialog"
+            android:entries="@array/codephrases" />
 
         <Spinner
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:id="@+id/codeSpinner2"
             android:layout_weight="1"
-            android:spinnerMode="dialog" />
+            android:spinnerMode="dialog"
+            android:entries="@array/codephrases" />
 
         <Spinner
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="match_parent"
             android:id="@+id/codeSpinner3"
             android:layout_weight="1"
-            android:spinnerMode="dialog" />
+            android:spinnerMode="dialog"
+            android:entries="@array/codephrases" />
     </LinearLayout>
 
     <Space
@@ -58,7 +62,7 @@
         <ImageButton
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:id="@+id/picBtn1"
+            android:id="@+id/lock1Button"
             android:clickable="true"
             android:scaleType="fitCenter"
             android:src="@drawable/locked"
@@ -68,7 +72,7 @@
         <ImageButton
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:id="@+id/picBtn2"
+            android:id="@+id/lock2Button"
             android:clickable="true"
             android:scaleType="fitCenter"
             android:src="@drawable/locked"
@@ -78,7 +82,7 @@
         <ImageButton
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:id="@+id/picBtn3"
+            android:id="@+id/lock3Button"
             android:clickable="true"
             android:scaleType="fitCenter"
             android:layout_weight="0.33"
@@ -110,14 +114,18 @@
             android:text="@string/successBtn"
             android:id="@+id/successBtn"
             android:layout_weight="1"
-            android:textSize="20sp" />
+            android:textSize="20sp"
+            android:onClick="callSuccessSoundPickUp"
+            android:enabled="true"
+            android:clickable="true" />
 
         <Button
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Проиграть звук успеха"
             android:id="@+id/playSuccessBtn"
-            android:layout_weight="10" />
+            android:layout_weight="10"
+            android:onClick="playSuccessSound" />
 
         <Button
             android:layout_width="wrap_content"
@@ -125,14 +133,16 @@
             android:text="@string/FailBtn"
             android:id="@+id/failBtn"
             android:layout_weight="1"
-            android:textSize="20sp" />
+            android:textSize="20sp"
+            android:onClick="callFailSoundPickUp" />
 
         <Button
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Проиграть звук неудачи"
             android:id="@+id/playFailBtn"
-            android:layout_weight="10" />
+            android:layout_weight="10"
+            android:onClick="playFailSound" />
 
     </LinearLayout>
 
@@ -183,7 +193,6 @@
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
             android:id="@+id/toggleYaOnline"
-            android:onClick="turnYandexOn"
             android:longClickable="false"
             android:layout_gravity="right"
             android:layout_weight="0.2"
@@ -197,18 +206,5 @@
         android:layout_height="wrap_content"
         android:layout_weight="0.1"
         android:layout_gravity="center_horizontal" />
-
-    <Button
-        style="@android:style/Widget.Holo.Button"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="@string/backBtn"
-        android:id="@+id/backBtn"
-        android:enabled="true"
-        android:singleLine="true"
-        android:layout_gravity="center_horizontal"
-        android:textSize="25sp"
-        android:layout_weight="0.1"
-        android:onClick="callMainScreen" />
 
 </LinearLayout>
