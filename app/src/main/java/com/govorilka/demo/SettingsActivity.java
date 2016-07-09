@@ -3,8 +3,6 @@ package com.govorilka.demo;
 import android.app.Activity;
 import android.content.Intent;
 import android.graphics.Bitmap;
-import android.graphics.Matrix;
-import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
@@ -168,19 +166,7 @@ public class SettingsActivity extends Activity {
     }
 
 
-    public static Bitmap getResizedBitmap(Bitmap image, int newHeight, int newWidth) {
-        int width = image.getWidth();
-        int height = image.getHeight();
-        float scaleWidth = ((float) newWidth) / width;
-        float scaleHeight = ((float) newHeight) / height;
-        // create a matrix for the manipulation
-        Matrix matrix = new Matrix();
-        // resize the bit map
-        matrix.postScale(scaleWidth, scaleHeight);
-        // recreate the new Bitmap
-        Bitmap resizedBitmap = Bitmap.createBitmap(image, 0, 0, width, height, matrix, false);
-        return resizedBitmap;
-    }
+
 
 
     public String readPictureUrl(String filename) {
@@ -262,10 +248,7 @@ public class SettingsActivity extends Activity {
         Bitmap bitmap = null;
         Bitmap scaledBitmap = null;
 
-//        String imagePath = openPicInfo(filename);
         String imagePath = openPictureAudioURL(filename);
-
-//        if (imagePath == null) return;
 
         if (imagePath != null && imagePath != "") {
             Uri selectedImage = Uri.parse(imagePath);
@@ -276,7 +259,8 @@ public class SettingsActivity extends Activity {
             }
 
             // вот этот ужас переделать на процентное соотношение
-            scaledBitmap = getResizedBitmap(bitmap, bitmap.getHeight() / 5, bitmap.getWidth() / 5);
+            ResizedBitmap resizedBitmap = new ResizedBitmap();
+            scaledBitmap = resizedBitmap.getResizedBitmap(bitmap, bitmap.getHeight() / 5, bitmap.getWidth() / 5);
 
             if (buttonName == "lock1Button") {
                 imageView = (ImageView) findViewById(R.id.lock1Button);
@@ -389,30 +373,14 @@ public class SettingsActivity extends Activity {
         btn3Clicked = false;
     }
 
-    void playSound(String soundURL) {
-        MediaPlayer mMediaPlayer;
-        mMediaPlayer = new MediaPlayer();
-        try {
-            Uri soundURI = Uri.parse(soundURL);
-            mMediaPlayer.setDataSource(this, soundURI);
-        } catch (IOException e) {
 
-        }
-        try {
-            mMediaPlayer.prepare();
-        } catch (IOException e) {
-            return;
-        }
-        mMediaPlayer.setVolume(1f, 1f);
-        mMediaPlayer.setLooping(false);
-        mMediaPlayer.start();
-    }
 
     public void playSuccessSound(View view) {
         String soundPath = null;
         soundPath = openPictureAudioURL("sound_success.txt");
 
-        if (soundPath != null) playSound(soundPath);
+        PlaySound playSound = new PlaySound();
+        if (soundPath != null) playSound.playSound(soundPath, this);
     }
 
 
@@ -420,7 +388,8 @@ public class SettingsActivity extends Activity {
         String soundPath = null;
         soundPath = openPictureAudioURL("sound_fail.txt");
 
-        if (soundPath != null) playSound(soundPath);
+        PlaySound playSound = new PlaySound();
+        if (soundPath != null) playSound.playSound(soundPath, this);
     }
 
     public String openPictureAudioURL(String filename) {
