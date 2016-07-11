@@ -15,13 +15,13 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_weight="0.5"
+        android:layout_weight="0.4"
         android:orientation="horizontal">
 
         <Spinner
             android:id="@+id/codeSpinner1"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="match_parent"
             android:layout_weight="1"
             android:entries="@array/codephrases"
             android:spinnerMode="dropdown" />
@@ -97,10 +97,9 @@
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="67dp"
+        android:layout_height="75dp"
         android:orientation="horizontal"
         android:measureWithLargestChild="false"
-        android:showDividers="middle|beginning|end"
         android:layout_weight=".5">
 
         <Button
@@ -109,7 +108,7 @@
             android:layout_height="wrap_content"
             android:onClick="callSuccessSoundPickUp"
             android:text="@string/successBtn"
-            android:textSize="15sp"
+            android:textSize="12sp"
             android:layout_weight="1" />
 
         <Button
@@ -118,7 +117,7 @@
             android:layout_height="wrap_content"
             android:onClick="playSuccessSound"
             android:text="@string/sound_success"
-            android:textSize="15sp"
+            android:textSize="10sp"
             android:layout_weight="1" />
 
         <Button
@@ -127,7 +126,7 @@
             android:layout_height="wrap_content"
             android:onClick="callFailSoundPickUp"
             android:text="@string/FailBtn"
-            android:textSize="15sp"
+            android:textSize="10sp"
             android:layout_weight="1" />
 
         <Button
@@ -136,7 +135,7 @@
             android:layout_height="wrap_content"
             android:onClick="playFailSound"
             android:text="@string/playFailSound"
-            android:textSize="15sp"
+            android:textSize="10sp"
             android:layout_weight="1" />
     </LinearLayout>
 
