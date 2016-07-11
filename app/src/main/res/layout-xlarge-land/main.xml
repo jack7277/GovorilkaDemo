@@ -4,16 +4,15 @@
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
     android:orientation="vertical"
-    android:padding="16dp"
     tools:context=".GovorilkaActivity"
-    android:weightSum="1">
-
+    android:weightSum="1"
+    android:padding="5dp">
 
     <LinearLayout
         android:orientation="horizontal"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_weight="0.02" >
+        android:layout_weight="0.02">
 
         <Button
             android:onClick="buttonExitClick"
@@ -66,11 +65,10 @@
 
     <ImageView
         android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="10dp"
         android:id="@+id/imageViewBig"
         android:layout_gravity="center_horizontal"
-        android:scaleType="fitCenter"
-        android:layout_weight=".0001" />
+        android:scaleType="fitCenter" />
 
     <LinearLayout
         android:orientation="horizontal"

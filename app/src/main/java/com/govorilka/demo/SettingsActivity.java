@@ -30,6 +30,11 @@ import java.io.OutputStreamWriter;
 public class SettingsActivity extends Activity {
 
     @Override
+    protected void onSaveInstanceState(Bundle savedInstanceState) {
+        super.onSaveInstanceState(savedInstanceState);
+    }
+
+    @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
@@ -372,8 +377,6 @@ public class SettingsActivity extends Activity {
         btn2Clicked = false;
         btn3Clicked = false;
     }
-
-
 
     public void playSuccessSound(View view) {
         String soundPath = null;
