@@ -46,6 +46,23 @@ public class SettingsActivity extends Activity {
 
         setContentView(R.layout.settings);
 
+        String soundPathSuccess = null;
+        soundPathSuccess = openPictureAudioURL("sound_success.txt");
+        if (soundPathSuccess != null && soundPathSuccess != "") {
+            ((TextView) findViewById(R.id.pathSuccessSnd)).setText(soundPathSuccess);
+        } else {
+            ((TextView) findViewById(R.id.pathSuccessSnd)).setText("Default TADA sound");
+        }
+
+        String soundPathFail = null;
+        soundPathFail = openPictureAudioURL("sound_fail.txt");
+        if (soundPathFail != null && soundPathFail != "") {
+            ((TextView) findViewById(R.id.pathFailSnd)).setText(soundPathFail);
+        } else {
+            ((TextView) findViewById(R.id.pathFailSnd)).setText("Default FAIL sound");
+        }
+
+
         // если файл codeX.txt существует, то загружается индекс списка
         // и по индексу устанавливается текст, индексы с нуля
         // filename = code1.txt,
@@ -54,8 +71,6 @@ public class SettingsActivity extends Activity {
         openPasswordFileIndexForSpinner("code2.txt", 1);
         openPasswordFileIndexForSpinner("code3.txt", 2);
 
-        ((TextView) findViewById(R.id.pathSuccessSnd)).setText(openPictureAudioURL("sound_success.txt"));
-        ((TextView) findViewById(R.id.pathFailSnd)).setText(openPictureAudioURL("sound_fail.txt"));
 
 // показываем картинки сохраненные на кнопках при открытии настроек
         showPic("pic1.txt", "lock1Button");
@@ -171,10 +186,6 @@ public class SettingsActivity extends Activity {
         btn3Clicked = true;
     }
 
-
-
-
-
     public String readPictureUrl(String filename) {
         String imagePath = null;
 
@@ -228,7 +239,6 @@ public class SettingsActivity extends Activity {
                             Spinner spinner = (Spinner) findViewById(R.id.codeSpinner2);
                             spinner.setSelection(passwordIndex);
                         }
-
                         break;
 
                         case 2: {
@@ -381,19 +391,30 @@ public class SettingsActivity extends Activity {
 
     public void playSuccessSound(View view) {
         String soundPath = null;
-        soundPath = openPictureAudioURL("sound_success.txt");
-
         PlaySound playSound = new PlaySound();
-        if (soundPath != null) playSound.playSound(soundPath, this);
+
+        soundPath = openPictureAudioURL("sound_success.txt");
+        if (soundPath != null && soundPath != "") {
+            playSound.playSound(soundPath, this);
+        } else {
+            // если не задан тада звук, то играть звуком по умолчанию из ресурсов
+            playSound.playDefaultTadaSound(this);
+        }
     }
 
 
     public void playFailSound(View view) {
         String soundPath = null;
+        PlaySound playSound = new PlaySound();
+
         soundPath = openPictureAudioURL("sound_fail.txt");
 
-        PlaySound playSound = new PlaySound();
-        if (soundPath != null) playSound.playSound(soundPath, this);
+        if (soundPath != null && soundPath != "") {
+            playSound.playSound(soundPath, this);
+        } else {
+            // если не задан пользовательский фейл, то играть фейл по умолчанию из ресурсов
+            playSound.playDefaultFailSound(this);
+        }
     }
 
     public String openPictureAudioURL(String filename) {

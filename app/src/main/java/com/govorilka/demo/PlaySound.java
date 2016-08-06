@@ -21,5 +21,44 @@ public class PlaySound {
         } catch (Exception e) {
             return;
         }
+
+        mMediaPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener()
+        {
+            public void onCompletion(MediaPlayer mp)
+            {
+                mp.release();
+            }
+        });
+    }
+
+    public void playDefaultFailSound(Context context){
+        MediaPlayer mediaPlayer = MediaPlayer.create(context, R.raw.fail);
+        mediaPlayer.setVolume(1f, 1f);
+        mediaPlayer.setLooping(false);
+        mediaPlayer.start();
+
+        mediaPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener()
+        {
+            public void onCompletion(MediaPlayer mp)
+            {
+                mp.release();
+            }
+        });
+    }
+
+
+    public void playDefaultTadaSound(Context context){
+        MediaPlayer mediaPlayer = MediaPlayer.create(context, R.raw.tada);
+        mediaPlayer.setVolume(1f, 1f);
+        mediaPlayer.setLooping(false);
+        mediaPlayer.start();
+
+        mediaPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener()
+        {
+            public void onCompletion(MediaPlayer mp)
+            {
+                mp.release();
+            }
+        });
     }
 }
