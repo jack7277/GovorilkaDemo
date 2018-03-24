@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/talk"
+        android:orderInCategory="10"
+        android:title="@string/talkButtonText"
+        android:showAsAction="always">
+    </item>
+
+    <item
+        android:id="@+id/settings"
+        android:orderInCategory="20"
+        android:title="@string/settingsText">
+    </item>
+
+    <item
+        android:id="@+id/exit"
+        android:orderInCategory="30"
+        android:title="@string/exitText">
+    </item>
+
+</menu>

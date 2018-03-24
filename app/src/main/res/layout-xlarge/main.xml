@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:orientation="vertical"
+    tools:context=".GovorilkaActivity"
+    android:weightSum="1"
+    android:padding="5dp">
+
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_weight="0.02">
+
+        <Button
+            android:onClick="buttonExitClick"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:text="@string/exitText"
+            android:id="@+id/exitBtn"
+            android:enabled="true"
+            android:clickable="true"
+            android:layout_weight="1"
+            android:singleLine="true"
+            android:textSize="20sp" />
+
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:text="@string/settingsBtn"
+            android:id="@+id/settingsBtn"
+            android:layout_weight="1"
+            android:singleLine="true"
+            android:textSize="20sp"
+            android:clickable="true"
+            android:onClick="callSettingsScreen"
+            android:enabled="true" />
+
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:text="@string/reset"
+            android:id="@+id/resetBtn"
+            android:layout_weight="1"
+            android:onClick="resetButtonClick"
+            android:singleLine="true"
+            android:textSize="20sp"
+            android:clickable="true"
+            android:enabled="true" />
+
+        <Button
+            android:onClick="onTalkButtonClick"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:text="@string/talkButtonText"
+            android:id="@+id/talkBtn"
+            android:singleLine="true"
+            android:layout_weight="1"
+            android:textSize="20sp"
+            android:clickable="true"
+            android:enabled="true" />
+    </LinearLayout>
+
+    <ImageView
+        android:layout_width="match_parent"
+        android:layout_height="10dp"
+        android:id="@+id/imageViewBig"
+        android:layout_gravity="center_horizontal"
+        android:scaleType="fitCenter" />
+
+    <LinearLayout
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_weight=".9">
+
+        <ImageView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:id="@+id/smallPic1"
+            android:layout_weight="1"
+            android:scaleType="fitCenter" />
+
+        <ImageView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:id="@+id/smallPic2"
+            android:layout_weight="1"
+            android:scaleType="fitCenter" />
+
+        <ImageView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:id="@+id/smallPic3"
+            android:layout_weight="1"
+            android:scaleType="fitCenter" />
+    </LinearLayout>
+
+    <TextView
+        android:id="@+id/log_text"
+
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:layout_width="match_parent"
+        android:layout_weight=".05" />
+
+</LinearLayout>

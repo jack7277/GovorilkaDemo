@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="app_name">Говорилка Демо</string>
+    
+    <string name="kws_caption">Сначала скажите \"Няня\",\nзатем назовите цифру от 0 до 9".</string>
+    <string name="digits_caption">Говорите.</string>
+    <string name="exitText">Выход</string>
+    <string name="talkButtonText">Жми-Говори!</string>
+    <string name="ackBtn">Подтвердить</string>
+    <string name="reset">Сброс</string>
+    <string name="resetxLarge">Сброс</string>
+    <string name="yandexOnline">Яндекс онлайн ОТКЛЮЧЕН</string>
+    <string name="successBtn">Выбрать звук успеха</string>
+    <string name="FailBtn">Выбрать звук неудачи</string>
+    <string name="settingsText">Настройки</string>
+    <string name="choose3codePhrases">Выберите три кодовых слова:</string>
+    <string name="push3BtnImg">Нажмите на 3 замка и выберите из галереи изображения:</string>
+    <string name="SuccFailSounds">Нажмите для выбора звука успеха и неудачи распознавания:</string>
+    <string name="settingsBtn">Настройки</string>
+    <string name="settings_title">Говорилка Демо Настройки</string>
+    <string name="sound_success">Проиграть звук успеха</string>
+    <string name="playFailSound">Проиграть звук неудачи</string>
+
+    <string-array name="codephrases">
+        <item>москва</item>
+        <item>париж</item>
+        <item>амстердам</item>
+        <item>рим</item>
+        <item>новгород</item>
+        <item>ноль</item>
+        <item>один</item>
+        <item>два</item>
+        <item>три</item>
+        <item>четыре</item>
+        <item>пять</item>
+        <item>шесть</item>
+        <item>семь</item>
+        <item>восемь</item>
+        <item>девять</item>
+        <item>иванов</item>
+        <item>сидоров</item>
+        <item>мамбетов</item>
+        <item>абрамович</item>
+        <item>плюшкин</item>
+        <item>роза</item>
+        <item>флокс</item>
+        <item>гладиолус</item>
+        <item>нарцисс</item>
+        <item>ромашка</item>
+        <item>красный</item>
+        <item>оранжевый</item>
+        <item>желтый</item>
+        <item>зеленый</item>
+        <item>голубой</item>
+        <item>синий</item>
+        <item>фиолетовый</item>
+        <item>тру</item>
+        <item>ля</item>
+        <item>ляля</item>
+        <item>кис</item>
+        <item>кискис</item>
+        <item>мяу</item>
+        <item>мяумяу</item>
+        <item>бум</item>
+        <item>бада</item>
+        <item>биг</item>
+    </string-array>
+
+
+</resources>

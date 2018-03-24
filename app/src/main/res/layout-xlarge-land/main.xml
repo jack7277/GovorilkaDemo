@@ -18,7 +18,7 @@
             android:onClick="buttonExitClick"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
-            android:text="@string/btnExit"
+            android:text="@string/exitText"
             android:id="@+id/exitBtn"
             android:enabled="true"
             android:clickable="true"

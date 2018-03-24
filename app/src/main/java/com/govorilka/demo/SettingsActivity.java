@@ -48,6 +48,7 @@ public class SettingsActivity extends Activity {
 
         String soundPathSuccess = null;
         soundPathSuccess = openPictureAudioURL("sound_success.txt");
+
         if (soundPathSuccess != null && soundPathSuccess != "") {
             ((TextView) findViewById(R.id.pathSuccessSnd)).setText(soundPathSuccess);
         } else {
@@ -142,8 +143,8 @@ public class SettingsActivity extends Activity {
         finish();
 
         // заново запускаем основной экран активность
-        Intent intent = new Intent(this, GovorilkaActivity.class);
-        startActivity(intent);
+//        Intent intent = new Intent(this, GovorilkaActivity.class);
+//        startActivity(intent);
     }
 
     // Метод для сохранения файла с кодом
@@ -417,6 +418,12 @@ public class SettingsActivity extends Activity {
         }
     }
 
+
+//    void DeleteFile (String filename){
+//        File file = new File(filename);
+//        boolean deleted = file.delete();
+//    }
+
     public String openPictureAudioURL(String filename) {
         String imagePath = "";
 
@@ -424,6 +431,7 @@ public class SettingsActivity extends Activity {
         try {
             br = new BufferedReader(new InputStreamReader(openFileInput(filename)));
             imagePath = br.readLine();
+
             br.close();
         } catch (FileNotFoundException e) {
         } catch (IOException e) {

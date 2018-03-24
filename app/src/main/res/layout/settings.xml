@@ -93,7 +93,7 @@
     <Space
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_weight="0.07" />
+        android:layout_weight="0.1" />
 
     <TextView
         android:layout_width="match_parent"
@@ -119,7 +119,8 @@
                 android:textSize="15sp"
                 android:onClick="callSuccessSoundPickUp"
                 android:layout_row="1"
-                android:layout_column="0" />
+                android:layout_column="0"
+                android:longClickable="true" />
 
             <Button
                 android:layout_width="wrap_content"
@@ -144,7 +145,8 @@
                 android:textSize="15sp"
                 android:onClick="callFailSoundPickUp"
                 android:layout_row="2"
-                android:layout_column="0" />
+                android:layout_column="0"
+                android:longClickable="true" />
 
             <Button
                 android:layout_width="wrap_content"
@@ -197,6 +199,49 @@
             android:id="@+id/pathFailSnd"
             android:layout_weight="1"
             android:textSize="10sp" />
+    </LinearLayout>
+
+    <Space
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_weight="0.1" />
+
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Количество паролей"
+            android:id="@+id/textView2"
+            android:layout_gravity="center" />
+
+        <RadioButton
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="1"
+            android:id="@+id/radioButton1"
+            android:checked="true"
+            android:layout_weight="1" />
+
+        <RadioButton
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="2"
+            android:id="@+id/radioButton2"
+            android:checked="false"
+            android:layout_weight="1" />
+
+        <RadioButton
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="3"
+            android:id="@+id/radioButton3"
+            android:checked="false"
+            android:layout_weight="1" />
+
     </LinearLayout>
 
 </LinearLayout>
