@@ -986,7 +986,7 @@ public class GovorilkaActivity extends Activity implements RecognitionListener, 
             return;
         }
 
-        if (yandexIsOn = true) {
+        if (yandexIsOn == true) {
             yandexIsOn = false;
             try {
                 recognizer2.cancel();
